@@ -1,0 +1,37 @@
+site_name: Receptenboek
+site_description: Een verzameling van recepten.
+site_author: Rik Huygen
+docs_dir: src
+site_dir: site
+
+theme:
+  name: material
+  language: nl
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Donkere modus
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Lichte modus
+  features:
+    - navigation.top
+    - search.suggest
+    - toc.integrate
+
+markdown_extensions:
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - awesome-pages

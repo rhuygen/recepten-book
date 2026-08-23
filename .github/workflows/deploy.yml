@@ -1,0 +1,43 @@
+name: Bouw en publiceer het receptenboek
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Haal de broncode op
+        uses: actions/checkout@v4
+
+      - name: Stel Python in
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installeer Python-afhankelijkheden
+        run: pip install -r requirements.txt
+
+      - name: Installeer Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Installeer Typst
+        uses: typst-community/setup-typst@v5
+
+      - name: Bouw de site
+        run: mkdocs build --strict
+
+      - name: Render de PDF
+        run: python3 scripts/build_pdf.py src/recepten site/pdf/receptenboek.pdf
+
+      - name: Publiceer naar GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

@@ -1,0 +1,12 @@
+/* Float a recipe's lead photo to the right of the intro text. Applies
+   automatically to any recipe page whose first paragraph is a single
+   image, so recipe files need no per-image styling markup. */
+.md-typeset > p:first-child:has(> img:only-child) {
+  float: right;
+  width: 30%;
+  margin: 0 0 1em 1.5em;
+}
+
+.md-typeset > p:first-child:has(> img:only-child) img {
+  width: 100%;
+}
