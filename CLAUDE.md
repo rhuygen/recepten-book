@@ -42,6 +42,25 @@ python3 scripts/build_pdf.py src/recepten site/pdf/receptenboek.pdf
 These two build steps are independent of each other and can run in any
 order.
 
+Check that `main_ingredients` spellings match across recipes, before a
+PDF build (see the ingredient index note under Architecture):
+
+```bash
+python3 scripts/check_ingredients.py src/recepten
+```
+
+Add an ingredient to `main_ingredients` in every recipe that uses it, for
+example when it becomes important to track across the book (an allergy,
+say):
+
+```bash
+python3 scripts/add_ingredient.py komijn src/recepten
+```
+
+It prints the list of recipes it changed. Check that list against `git
+diff` before you commit, since it matches recipe text by substring and
+can occasionally catch an unrelated word.
+
 ## Architecture
 
 - `docs_dir` is set to `src`, not the MkDocs default `docs`. All source
@@ -91,7 +110,9 @@ order.
   ingredients, not the full ingredient list -- and reuse the exact same
   spelling across recipes for a shared ingredient (for example always
   "spek", never a mix of "spek" and "spekjes" and "spekblokjes"), since
-  the index groups entries by exact string match, not by meaning.
+  the index groups entries by exact string match, not by meaning. Run
+  `scripts/check_ingredients.py` (see Commands) to catch a mismatched
+  spelling before it reaches the index.
   MkDocs' own front matter handling silently discards this block from
   the website, so it never appears there.
 - `scripts/build_pdf.py` resolves each ingredient's page number at PDF
