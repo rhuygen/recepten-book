@@ -1,3 +1,6 @@
+---
+main_ingredients: spliterwten, rookworst, spek
+---
 
 ![Erwtensoep](../Images/erwtensoep.jpg)
 

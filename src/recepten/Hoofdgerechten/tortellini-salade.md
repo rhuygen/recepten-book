@@ -1,3 +1,7 @@
+---
+main_ingredients: tortellini, kip, spek
+---
+
 ![Tortellini salade met kip en spekjes](../Images/tortellini-salade.jpg)
 
 # Tortellini Salade met Kip en Spekjes
@@ -38,3 +42,5 @@ Recept voor: 6 personen
 
 Als je de salade later wilt serveren, voeg dan nog niet de rucola melange toe.
 Doe dit pas op het laatste moment.
+
+Bron: https://www.lekkerensimpel.com/tortellini-salade-met-kip-en-spekjes/

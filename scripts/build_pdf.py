@@ -13,6 +13,19 @@ two-column layout instead: everything between the image and the first
 heading-and-list pair (the title, and any intro text) stays full-width,
 and the image is placed beside that heading-and-list pair itself.
 
+A recipe may start with a small `main_ingredients` front matter block,
+for example:
+
+    ---
+    main_ingredients: aardbeien, mascarpone
+    ---
+
+Every ingredient listed there is added to an ingredient index at the end
+of the PDF, alongside the recipe's page number. The page numbers are
+resolved by Typst itself at compile time (via a label on each recipe's
+title and `query()`/`location()`), so they stay correct as recipes are
+added, removed, or reordered -- nothing here hardcodes a page number.
+
 Usage: python3 scripts/build_pdf.py <recipes_dir> <output_pdf_path>
 """
 
@@ -24,6 +37,9 @@ import sys
 import tempfile
 
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]*)\)$")
+H1_RE = re.compile(r"^#(?!#)\s+(.*)$")
+LIST_ITEM_RE = re.compile(r"^(-|\*|\+|\d+\.)\s")
+FRONT_MATTER_RE = re.compile(r"\A---\n(.*?\n)---\n?", re.DOTALL)
 
 
 def collect_recipes(recipes_dir: str) -> list[str]:
@@ -36,15 +52,29 @@ def collect_recipes(recipes_dir: str) -> list[str]:
     return files
 
 
+def slugify(path: str) -> str:
+    base = os.path.splitext(os.path.basename(path))[0]
+    return "recipe-" + re.sub(r"[^a-zA-Z0-9]+", "-", base).strip("-").lower()
+
+
+def extract_front_matter(text: str) -> tuple[dict[str, str], str]:
+    match = FRONT_MATTER_RE.match(text)
+    if not match:
+        return {}, text
+    meta = {}
+    for line in match.group(1).splitlines():
+        key, sep, value = line.partition(":")
+        if sep:
+            meta[key.strip()] = value.strip()
+    return meta, text[match.end() :]
+
+
 def split_blocks(text: str) -> list[str]:
     return [b.strip() for b in re.split(r"\n\s*\n+", text.strip()) if b.strip()]
 
 
 def is_heading(block: str) -> bool:
     return block.startswith("#")
-
-
-LIST_ITEM_RE = re.compile(r"^(-|\*|\+|\d+\.)\s")
 
 
 def is_list(block: str) -> bool:
@@ -67,7 +97,7 @@ def lead_image_grid(image_path: str, pair_markdown: str) -> str:
     image_literal = image_path.replace("\\", "\\\\").replace('"', '\\"')
     return (
         "```{=typst}\n"
-        "#grid(columns: (1fr, 40%), gutter: 1.5em, align: top,\n"
+        "#grid(columns: (1fr, 30%), gutter: 1.5em, align: top,\n"
         "  [\n"
         f"{pair_typst}\n"
         "  ],\n"
@@ -77,14 +107,23 @@ def lead_image_grid(image_path: str, pair_markdown: str) -> str:
     )
 
 
-def apply_lead_image_layout(path: str, text: str) -> str:
-    blocks = split_blocks(text)
+def tag_title(blocks: list[str], slug: str) -> tuple[list[str], str]:
+    """Add a Typst label to the recipe's title heading; return its plain text."""
+    for i, block in enumerate(blocks):
+        match = H1_RE.match(block)
+        if match:
+            blocks[i] = f"{block} {{#{slug}}}"
+            return blocks, match.group(1).strip()
+    return blocks, ""
+
+
+def apply_lead_image_layout(path: str, blocks: list[str]) -> list[str]:
     if not blocks:
-        return text
+        return blocks
 
     match = IMAGE_RE.match(blocks[0])
     if not match:
-        return text
+        return blocks
 
     image_ref = match.group(1).replace("%20", " ")
     image_path = os.path.normpath(os.path.join(os.path.dirname(path), image_ref))
@@ -99,24 +138,70 @@ def apply_lead_image_layout(path: str, text: str) -> str:
         None,
     )
     if pair_index is None:
-        return text
+        return blocks
 
     before = rest[:pair_index]
     pair_blocks = rest[pair_index : pair_index + 2]
     after = rest[pair_index + 2 :]
 
     grid = lead_image_grid(image_path, "\n\n".join(pair_blocks))
-    return "\n\n".join(before + [grid] + after)
+    return before + [grid] + after
+
+
+def process_recipe(path: str) -> tuple[str, list[tuple[str, str, str]]]:
+    """Return (recipe's Typst-ready markdown, [(ingredient, title, slug), ...])."""
+    with open(path, encoding="utf-8") as f:
+        raw = f.read().replace("%20", " ")
+    meta, body = extract_front_matter(raw)
+
+    slug = slugify(path)
+    blocks = split_blocks(body)
+    blocks, title = tag_title(blocks, slug)
+    blocks = apply_lead_image_layout(path, blocks)
+
+    ingredients = [
+        (ingredient.strip(), title, slug)
+        for ingredient in meta.get("main_ingredients", "").split(",")
+        if ingredient.strip() and title
+    ]
+    return "\n\n".join(blocks), ingredients
+
+
+def typst_text_escape(s: str) -> str:
+    return s.replace("\\", "\\\\").replace('"', '\\"').replace("@", "\\@")
+
+
+def build_ingredient_index(entries: dict[str, list[tuple[str, str]]]) -> str:
+    if not entries:
+        return ""
+
+    lines = ["```{=typst}", "#pagebreak()", "= Ingrediëntenindex", ""]
+    for ingredient in sorted(entries, key=str.casefold):
+        refs = []
+        for title, slug in entries[ingredient]:
+            page_lookup = f'#context query(label("{slug}")).first().location().page()'
+            refs.append(f"{typst_text_escape(title)} (p. {page_lookup})")
+        lines.append(f"- *{typst_text_escape(ingredient)}*: " + ", ".join(refs))
+    lines.append("```")
+    return "\n".join(lines)
 
 
 def build_combined_markdown(files: list[str]) -> str:
     parts = []
+    entries: dict[str, list[tuple[str, str]]] = {}
     for path in files:
-        with open(path, encoding="utf-8") as f:
-            text = f.read().replace("%20", " ")
-        parts.append(apply_lead_image_layout(path, text.strip()))
+        markdown, recipe_ingredients = process_recipe(path)
+        parts.append(markdown)
+        for ingredient, title, slug in recipe_ingredients:
+            entries.setdefault(ingredient, []).append((title, slug))
+
     pagebreak = "```{=typst}\n#pagebreak()\n```"
-    return pagebreak + "\n\n" + ("\n\n" + pagebreak + "\n\n").join(parts)
+    combined = pagebreak + "\n\n" + ("\n\n" + pagebreak + "\n\n").join(parts)
+
+    index = build_ingredient_index(entries)
+    if index:
+        combined += "\n\n" + index
+    return combined
 
 
 def main() -> None:
@@ -134,6 +219,8 @@ def main() -> None:
         tmp.write(combined)
         combined_path = tmp.name
 
+    header_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pdf_header.typ")
+
     try:
         subprocess.run(
             [
@@ -141,12 +228,13 @@ def main() -> None:
                 combined_path,
                 "--pdf-engine=typst",
                 f"--resource-path={resource_path}",
+                f"--include-in-header={header_path}",
                 "--metadata",
                 "title=Receptenboek",
                 "--metadata",
                 "subtitle=Een verzameling van recepten",
                 "--metadata",
-                "author=Rik Huygen",
+                "author=Erika van den Heuvel & Rik Huygen",
                 "--metadata",
                 "lang=nl",
                 "--metadata",

@@ -1,6 +1,12 @@
+---
+main_ingredients: aardbeien, mascarpone
+---
+
 ![Aardbeientiramisu](../Images/aardbeientiramisu.jpg)
 
-# Aardbeientiramisu – 6 à 8 personen
+# Aardbeientiramisu
+
+Recept voor 6 à 8 personen.
 
 ## Ingrediënten
 

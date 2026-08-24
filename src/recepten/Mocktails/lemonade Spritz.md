@@ -1,3 +1,7 @@
+---
+main_ingredients: limonade, ginger ale
+---
+
 ![Lemonade Spritz](../Images/lemonade%20spritz.png)
 
 # Lemonade Spritz

@@ -78,6 +78,27 @@ order.
     list. Everything between the image and that point (the title, any
     intro text) stays full-width, above it. A recipe with no such
     heading-and-list pair keeps its image full-width in the PDF.
+- A recipe may start with a small front matter block naming its main
+  ingredients, for example:
+  ```
+  ---
+  main_ingredients: aardbeien, mascarpone
+  ---
+  ```
+  Only the PDF uses this, for the ingredient index at the end of the
+  book (an alphabetical list of ingredients, each with the recipe(s) and
+  page number(s) that use it). Keep this list short -- a few defining
+  ingredients, not the full ingredient list -- and reuse the exact same
+  spelling across recipes for a shared ingredient (for example always
+  "spek", never a mix of "spek" and "spekjes" and "spekblokjes"), since
+  the index groups entries by exact string match, not by meaning.
+  MkDocs' own front matter handling silently discards this block from
+  the website, so it never appears there.
+- `scripts/build_pdf.py` resolves each ingredient's page number at PDF
+  compile time, with a Typst label on the recipe's title and a
+  `query()`/`location()` lookup in the index, rather than computing a
+  page number itself. This keeps the index correct with no extra step
+  as recipes are added, removed, or reordered.
 - The `mkdocs-awesome-pages-plugin` builds the website's navigation menu
   from the folder structure. A new file under `src/recepten/` appears in
   the menu on the next build, in alphabetical order, with no edit to

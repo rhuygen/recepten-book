@@ -1,3 +1,7 @@
+---
+main_ingredients: quinoa, kip, feta
+---
+
 ![Quinoa met kip](../Images/quinoa-met-kip.png)
 
 # Mediterrane quinoasalade met gegrilde kip
