@@ -1,6 +1,6 @@
 ![drie-kazen-pasta.jpg](../Images/drie-kazen-pasta.jpg)
 
-# 3 kazen pasta met tomaatjes in de oven en spekburgers
+# Drie kazen pasta met tomaatjes in de oven en spekburgers
 
 ## Ingrediënten
 
