@@ -177,11 +177,10 @@ def build_ingredient_index(entries: dict[str, list[tuple[str, str]]]) -> str:
 
     lines = ["```{=typst}", "#pagebreak()", "= Ingrediëntenindex", ""]
     for ingredient in sorted(entries, key=str.casefold):
-        refs = []
+        lines.append(f"- *{typst_text_escape(ingredient)}*")
         for title, slug in entries[ingredient]:
             page_lookup = f'#context query(label("{slug}")).first().location().page()'
-            refs.append(f"{typst_text_escape(title)} (p. {page_lookup})")
-        lines.append(f"- *{typst_text_escape(ingredient)}*: " + ", ".join(refs))
+            lines.append(f"  - {typst_text_escape(title)} (p. {page_lookup})")
     lines.append("```")
     return "\n".join(lines)
 
