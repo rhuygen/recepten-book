@@ -97,7 +97,7 @@ def lead_image_grid(image_path: str, pair_markdown: str) -> str:
     image_literal = image_path.replace("\\", "\\\\").replace('"', '\\"')
     return (
         "```{=typst}\n"
-        "#grid(columns: (1fr, 30%), gutter: 1.5em, align: top,\n"
+        "#grid(columns: (1fr, 50%), gutter: 1.5em, align: top,\n"
         "  [\n"
         f"{pair_typst}\n"
         "  ],\n"
