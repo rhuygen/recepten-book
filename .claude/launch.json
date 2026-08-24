@@ -6,6 +6,12 @@
       "runtimeExecutable": ".venv/bin/mkdocs",
       "runtimeArgs": ["serve", "--dev-addr", "127.0.0.1:8765"],
       "port": 8765
+    },
+    {
+      "name": "recepten-book-static-site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "site"],
+      "port": 8766
     }
   ]
 }
