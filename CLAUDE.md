@@ -36,7 +36,7 @@ Render the PDF straight from the recipe Markdown files, into `site/pdf/`,
 so it is published together with the website:
 
 ```bash
-python3 scripts/build_pdf.py src/recepten site/pdf/receptenboek.pdf
+python3 scripts/build_pdf.py docs/recepten site/pdf/receptenboek.pdf
 ```
 
 These two build steps are independent of each other and can run in any
@@ -46,7 +46,7 @@ Check that `main_ingredients` spellings match across recipes, before a
 PDF build (see the ingredient index note under Architecture):
 
 ```bash
-python3 scripts/check_ingredients.py src/recepten
+python3 scripts/check_ingredients.py docs/recepten
 ```
 
 Add an ingredient to `main_ingredients` in every recipe that uses it, for
@@ -54,7 +54,7 @@ example when it becomes important to track across the book (an allergy,
 say):
 
 ```bash
-python3 scripts/add_ingredient.py komijn src/recepten
+python3 scripts/add_ingredient.py komijn docs/recepten
 ```
 
 It prints the list of recipes it changed. Check that list against `git
@@ -63,14 +63,14 @@ can occasionally catch an unrelated word.
 
 ## Architecture
 
-- `docs_dir` is set to `src`, not the MkDocs default `docs`. All source
-  Markdown files live under `src/`.
-- `src/index.md` is the home page of the website.
-- `src/recepten/` holds one Markdown file per recipe, grouped into one
+- `docs_dir` uses the MkDocs default, `docs`. All source Markdown files
+  live under `docs/`.
+- `docs/index.md` is the home page of the website.
+- `docs/recepten/` holds one Markdown file per recipe, grouped into one
   subfolder per category (for example `Desserts`, `Soepen`). Add a new
   recipe by adding a new Markdown file to the right category folder. No
   other step is needed, for either the website or the PDF.
-- `src/recepten/Images/` holds the recipe photos. Recipes reference them
+- `docs/recepten/Images/` holds the recipe photos. Recipes reference them
   with a relative path, for example `../Images/erwtensoep.jpg`, always
   with plain Markdown image syntax (`![alt](path)`), never a raw HTML
   `<img>` tag. A raw `<img>` tag breaks on both outputs: MkDocs never
@@ -82,7 +82,7 @@ can occasionally catch an unrelated word.
   attribute syntax cannot be shared between them: MkDocs' attribute syntax
   (`{: width="30%" }`) and Pandoc's (`{width=30%}`) are mutually
   incompatible, so a single inline annotation cannot drive both outputs.
-  - The website: `src/stylesheets/extra.css`, registered as `extra_css`
+  - The website: `docs/stylesheets/extra.css`, registered as `extra_css`
     in `mkdocs.yml`, floats a recipe's lead image automatically whenever
     the recipe's first paragraph is a single image. No per-recipe markup
     needed.
@@ -121,11 +121,11 @@ can occasionally catch an unrelated word.
   page number itself. This keeps the index correct with no extra step
   as recipes are added, removed, or reordered.
 - The `mkdocs-awesome-pages-plugin` builds the website's navigation menu
-  from the folder structure. A new file under `src/recepten/` appears in
+  from the folder structure. A new file under `docs/recepten/` appears in
   the menu on the next build, in alphabetical order, with no edit to
-  `mkdocs.yml`. The file `src/recepten/.pages` sets the display title of
+  `mkdocs.yml`. The file `docs/recepten/.pages` sets the display title of
   the section in the menu.
-- `scripts/build_pdf.py` builds the PDF directly from `src/recepten/`,
+- `scripts/build_pdf.py` builds the PDF directly from `docs/recepten/`,
   independently of the website build. It walks the category folders in the
   same alphabetical order the website's navigation menu uses, concatenates
   the recipe files with a Typst page break between each one, and pipes the

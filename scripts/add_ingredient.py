@@ -38,7 +38,7 @@ def main() -> None:
     if len(sys.argv) < 2:
         raise SystemExit("Usage: python3 scripts/add_ingredient.py <ingredient_name> [recipes_dir]")
     name = sys.argv[1]
-    recipes_dir = sys.argv[2] if len(sys.argv) > 2 else "src/recepten"
+    recipes_dir = sys.argv[2] if len(sys.argv) > 2 else "docs/recepten"
 
     changed = []
     for path in collect_recipes(recipes_dir):

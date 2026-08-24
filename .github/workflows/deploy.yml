@@ -34,7 +34,7 @@ jobs:
         run: mkdocs build --strict
 
       - name: Render de PDF
-        run: python3 scripts/build_pdf.py src/recepten site/pdf/receptenboek.pdf
+        run: python3 scripts/build_pdf.py docs/recepten site/pdf/receptenboek.pdf
 
       - name: Publiceer naar GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
