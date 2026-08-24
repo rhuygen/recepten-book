@@ -1,7 +1,6 @@
 site_name: Receptenboek
 site_description: Een verzameling van recepten.
 site_author: Rik Huygen
-docs_dir: src
 site_dir: site
 
 theme:

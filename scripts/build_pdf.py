@@ -2,12 +2,12 @@
 
 This bypasses the MkDocs website build entirely and calls Pandoc, with
 Typst as the PDF engine, directly on the recipe files under
-src/recepten/. Typst gives proper page-break and figure control, which a
+docs/recepten/. Typst gives proper page-break and figure control, which a
 browser-based, CSS-driven PDF pipeline could not (see CLAUDE.md).
 
 For a recipe whose first block is a standalone image, the PDF places
 that image beside the ingredients instead of full-width, mirroring the
-"float right" look of the website (see src/stylesheets/extra.css). Typst
+"float right" look of the website (see docs/stylesheets/extra.css). Typst
 has no CSS-style text reflow around a floating image, so this is a fixed
 two-column layout instead: everything between the image and the first
 heading-and-list pair (the title, and any intro text) stays full-width,

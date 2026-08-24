@@ -57,7 +57,7 @@ def find_near_duplicates(names: list[str]) -> list[tuple[str, str, float]]:
 
 
 def main() -> None:
-    recipes_dir = sys.argv[1] if len(sys.argv) > 1 else "src/recepten"
+    recipes_dir = sys.argv[1] if len(sys.argv) > 1 else "docs/recepten"
     files = collect_recipes(recipes_dir)
     names = collect_ingredient_names(files)
 
