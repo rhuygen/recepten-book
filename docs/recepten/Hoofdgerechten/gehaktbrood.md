@@ -1,5 +1,5 @@
 ---
-main_ingredients: gehakt, kaas, mosterd
+main_ingredients: gehakt, kaas, mosterd, mozzarella
 ---
 
 ![Gehaktbrood](../Images/gehaktbrood.jpg)

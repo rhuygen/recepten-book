@@ -1,5 +1,5 @@
 ---
-main_ingredients: tortellini, kip, spek
+main_ingredients: tortellini, kip, spek, paprika
 ---
 
 ![Tortellini salade met kip en spekjes](../Images/tortellini-salade.jpg)
