@@ -1,3 +1,7 @@
+---
+main_ingredients: paprika
+---
+
 ![Enchiladas](../Images/enchiladas.jpg)
 
 # Enchiladas met gehakt, guacamole en zure room

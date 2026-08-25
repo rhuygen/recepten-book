@@ -1,3 +1,7 @@
+---
+main_ingredients: paprika
+---
+
 ![Chili con carne](../Images/chili-con-carne.jpg)
 
 # Chili con carne
