@@ -2,7 +2,7 @@
 main_ingredients: champignon
 ---
 
-![Champignons Stroganoff](../Images/champignons-stroganoff.jpg)
+![Champignons Stroganoff|40%](../Images/champignons-stroganoff.jpg)
 
 # Champignon Stroganoff
 
