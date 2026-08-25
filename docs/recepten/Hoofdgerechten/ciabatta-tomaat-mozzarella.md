@@ -2,7 +2,7 @@
 main_ingredients: mozzarella
 ---
 
-![Ciabatta](../Images/ciabatta-tomaat-mozzarella.png)
+![Ciabatta|40%](../Images/ciabatta-tomaat-mozzarella.png)
 
 # Ciabatta met tomaat en mozzarella
 

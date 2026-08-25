@@ -97,6 +97,14 @@ can occasionally catch an unrelated word.
     list. Everything between the image and that point (the title, any
     intro text) stays full-width, above it. A recipe with no such
     heading-and-list pair keeps its image full-width in the PDF.
+    The image's column takes up 50% of the page width by default. A
+    recipe can set its own width with a `|<width>` suffix on the image's
+    alt text, for example `![Erwtensoep|30%](../Images/erwtensoep.jpg)`.
+    The website renders the alt text as-is, so the suffix becomes part of
+    the image's `alt` attribute there (invisible unless the image fails
+    to load or a screen reader announces it). Only
+    `scripts/build_pdf.py` reads the suffix, and it strips it from the
+    alt text before the recipe reaches Pandoc.
 - A recipe may start with a small front matter block naming its main
   ingredients, for example:
   ```

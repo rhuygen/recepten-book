@@ -13,6 +13,17 @@ two-column layout instead: everything between the image and the first
 heading-and-list pair (the title, and any intro text) stays full-width,
 and the image is placed beside that heading-and-list pair itself.
 
+That image column is 50% of the page width by default. A recipe can set
+its own width by adding `|<width>` after the alt text, for example:
+
+    ![Erwtensoep|30%](../Images/erwtensoep.jpg)
+
+The website renders the alt text as-is, so "Erwtensoep|30%" becomes the
+image's `alt` attribute there (invisible unless the image fails to load
+or a screen reader announces it). Only this script reads the `|<width>`
+suffix, and it strips it from the alt text before the recipe reaches
+Pandoc.
+
 A recipe may start with a small `main_ingredients` front matter block,
 for example:
 
@@ -36,10 +47,18 @@ import subprocess
 import sys
 import tempfile
 
-IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]*)\)$")
+IMAGE_RE = re.compile(r"^!\[([^\]]*)\]\(([^)]*)\)$")
 H1_RE = re.compile(r"^#(?!#)\s+(.*)$")
 LIST_ITEM_RE = re.compile(r"^(-|\*|\+|\d+\.)\s")
 FRONT_MATTER_RE = re.compile(r"\A---\n(.*?\n)---\n?", re.DOTALL)
+
+# A lead image may set its own width in the PDF's two-column grid with a
+# `|<width>` suffix on its alt text, for example
+# `![Erwtensoep|30%](../Images/erwtensoep.jpg)`. Only the PDF build (this
+# script) reads this suffix; it is stripped before the alt text reaches
+# Pandoc. The website renders the alt text (including the suffix) as-is.
+WIDTH_VALUE_RE = re.compile(r"^\d+(\.\d+)?%$")
+DEFAULT_LEAD_IMAGE_WIDTH = "50%"
 
 
 def collect_recipes(recipes_dir: str) -> list[str]:
@@ -92,12 +111,12 @@ def markdown_to_typst(markdown: str) -> str:
     return result.stdout
 
 
-def lead_image_grid(image_path: str, pair_markdown: str) -> str:
+def lead_image_grid(image_path: str, pair_markdown: str, width: str) -> str:
     pair_typst = markdown_to_typst(pair_markdown)
     image_literal = image_path.replace("\\", "\\\\").replace('"', '\\"')
     return (
         "```{=typst}\n"
-        "#grid(columns: (1fr, 50%), gutter: 1.5em, align: top,\n"
+        f"#grid(columns: (1fr, {width}), gutter: 1.5em, align: top,\n"
         "  [\n"
         f"{pair_typst}\n"
         "  ],\n"
@@ -125,7 +144,19 @@ def apply_lead_image_layout(path: str, blocks: list[str]) -> list[str]:
     if not match:
         return blocks
 
-    image_ref = match.group(1).replace("%20", " ")
+    alt_text, raw_ref = match.groups()
+    if "|" in alt_text:
+        alt_text, _, width = alt_text.rpartition("|")
+        if not WIDTH_VALUE_RE.match(width):
+            raise SystemExit(f"{path}: invalid |<width> suffix {width!r}, expected a percentage like '30%'")
+    else:
+        width = DEFAULT_LEAD_IMAGE_WIDTH
+
+    # The width suffix is PDF-only bookkeeping; strip it before the alt
+    # text goes anywhere near Pandoc.
+    blocks[0] = f"![{alt_text}]({raw_ref})"
+
+    image_ref = raw_ref.replace("%20", " ")
     image_path = os.path.normpath(os.path.join(os.path.dirname(path), image_ref))
     rest = blocks[1:]
 
@@ -144,7 +175,7 @@ def apply_lead_image_layout(path: str, blocks: list[str]) -> list[str]:
     pair_blocks = rest[pair_index : pair_index + 2]
     after = rest[pair_index + 2 :]
 
-    grid = lead_image_grid(image_path, "\n\n".join(pair_blocks))
+    grid = lead_image_grid(image_path, "\n\n".join(pair_blocks), width)
     return before + [grid] + after
 
 
