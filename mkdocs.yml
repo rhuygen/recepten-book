@@ -6,6 +6,8 @@ site_dir: site
 theme:
   name: material
   language: nl
+  favicon: assets/favicon.svg
+  logo: assets/logo.svg
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
