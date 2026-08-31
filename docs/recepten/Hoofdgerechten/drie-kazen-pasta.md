@@ -1,3 +1,7 @@
+---
+main_ingredients: tomaat, spek
+---
+
 ![drie-kazen-pasta.jpg](../Images/drie-kazen-pasta.jpg)
 
 # Drie kazen pasta met tomaatjes in de oven en spekburgers
@@ -39,7 +43,6 @@
 ## De spekburgers
 
 - Bak de burgers gaar in een pan met een beetje boter.
-
 
 Dien alles samen op!
 
