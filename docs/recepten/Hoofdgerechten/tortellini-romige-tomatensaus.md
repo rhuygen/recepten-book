@@ -26,17 +26,19 @@ Recept voor vier personen.
 
 ## Bereiding
 
-Kook de tortellini beetgaar volgens de verpakking.
+- Hak de ui en knoflook fijn. Verhit een beetje olie of boter in een pan en fruit de ui en knoflook hierin.
+- Voeg de tomatenpuree toe en bak een minuutje mee.
+- Doe dan de geroosterde paprika in reepjes erbij, net als de Italiaanse kruiden, peper, zout en de hele cherrytomaatjes (deze kun je evt. ook doormidden snijden).
+- Doe dan de verse grof gehakte spinazie erbij en schep erdoor tot het warm is.
+- Bak nog een paar minuutjes tot de tomaatjes zacht zijn.
 
-Hak ondertussen de ui en knoflook fijn. Verhit een beetje olie of boter in een pan en fruit de ui en knoflook hierin.
+- Kook ondertussen de tortellini beetgaar volgens de verpakking.
 
-Voeg de tomatenpuree toe en bak een minuutje mee. Doe dan de geroosterde paprika in reepjes erbij, net als de Italiaanse kruiden, peper, zout en de hele cherrytomaatjes (deze kun je evt. ook doormidden snijden). Bak nog een paar minuutjes tot de tomaatjes zacht zijn.
+- Giet de room bij de groenten en roer er goed doorheen.
+- Voeg vervolgens ook de geraspte Parmezaanse kaas toe.
 
-Giet dan de room erbij en roer er goed doorheen. En vervolgens ook de geraspte Parmezaanse kaas.
-
-Dan is de romige tomatensaus klaar en kan de gekookte tortellini erbij. Schep dit door de saus. Laat heel eventjes zachtjes mee pruttelen.
-
-Doe dan de verse grof gehakte spinazie erbij en schep erdoor tot het warm is.
+- Dan is de romige tomatensaus klaar en kan de gekookte tortellini erbij.
+- Schep dit door de saus en laat heel eventjes zachtjes mee pruttelen.
 
 Serveer de tortellini eventueel met wat extra Parmezaanse kaas.
 
