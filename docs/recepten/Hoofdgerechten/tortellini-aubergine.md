@@ -6,7 +6,7 @@ main_ingredients: aubergine, tortellini, provolone, pecorino
 
 # Gegratineerde tortellini met aubergine en Italiaanse kazen
 
-### Ingrediënten
+## Ingrediënten
 
 - 2 aubergines
 - 1 rood pepertje
@@ -19,7 +19,7 @@ main_ingredients: aubergine, tortellini, provolone, pecorino
 - 3.5 eetl. olijfolie
 - peper en zout
 
-### Voorbereiding
+## Voorbereiding
 
 (40 min.)
 
@@ -30,7 +30,7 @@ main_ingredients: aubergine, tortellini, provolone, pecorino
 - Snipper de sjalot fijn.
 - Verwarm de oven voor op 200 °C.
 
-### Bereiding
+## Bereiding
 
 Leg de aubergineplakken op een bakplaat met bakpapier. Besprenkel met 2 eetl. olijfolie en bak 15 min. in de voorverwarmde oven. Draai na 8 min. om. Haal uit de oven.
 
