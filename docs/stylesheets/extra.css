@@ -1,6 +1,40 @@
-/* Float a recipe's lead photo to the right of the intro text. Applies
-   automatically to any recipe page whose first paragraph is a single
-   image, so recipe files need no per-image styling markup. */
+/* A recipe's lead photo beside its ingredients, mirroring the PDF's
+   two-column layout (see scripts/mkdocs_lead_image.py, which builds
+   this markup -- recipe files carry no layout markup themselves). */
+.md-typeset .lead-image-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5em;
+  margin: 0 0 1em;
+}
+
+.md-typeset .lead-image-row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.md-typeset .lead-image-row > p:has(> img:only-child) {
+  flex: 0 0 var(--lead-image-width, 30%);
+  margin: 0;
+}
+
+.md-typeset .lead-image-row > p:has(> img:only-child) img {
+  width: 100%;
+}
+
+@media screen and (max-width: 40em) {
+  .md-typeset .lead-image-row {
+    flex-direction: column;
+  }
+
+  .md-typeset .lead-image-row > p:has(> img:only-child) {
+    flex-basis: auto;
+    width: 100%;
+  }
+}
+
+/* Fallback for a recipe with no ingredients-shaped section to pair the
+   image with: float it beside whatever text follows instead. */
 .md-typeset > p:first-child:has(> img:only-child) {
   float: right;
   width: 30%;

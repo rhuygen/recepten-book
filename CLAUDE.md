@@ -77,34 +77,40 @@ can occasionally catch an unrelated word.
   rewrites the path inside it, so it resolves one directory too shallow
   under directory-style URLs, and Pandoc silently drops raw HTML `<img>`
   tags when writing Typst.
-- A recipe's lead photo, when it wants a "beside the text" look instead of
-  full-width, gets that from two independent places, since inline
-  attribute syntax cannot be shared between them: MkDocs' attribute syntax
-  (`{: width="30%" }`) and Pandoc's (`{width=30%}`) are mutually
-  incompatible, so a single inline annotation cannot drive both outputs.
-  - The website: `docs/stylesheets/extra.css`, registered as `extra_css`
-    in `mkdocs.yml`, floats a recipe's lead image automatically whenever
-    the recipe's first paragraph is a single image. No per-recipe markup
-    needed.
+- A recipe's lead photo, when it wants a "beside the ingredients" look
+  instead of full-width, gets that on both outputs from the same
+  starting point: finding the first heading immediately followed by a
+  list (the ingredients, whatever that section happens to be titled --
+  "Ingrediënten", "Benodigdheden", ...). Everything before that heading
+  (the title, any intro text) stays full-width, above it. A recipe with
+  no such heading-and-list pair keeps its image full-width. No
+  per-recipe markup is needed for this placement; both builds detect it
+  from a recipe whose first block is a standalone image.
+  - `scripts/lead_image.py` holds the parsing both builds share: finding
+    the lead image and the heading-and-list pair, and reading the
+    image's own column width from a `|<width>` suffix on its alt text,
+    for example `![Erwtensoep|30%](../Images/erwtensoep.jpg)`. Both
+    builds strip the suffix before it reaches the page, so it never
+    appears anywhere, including as the image's `alt` text.
+  - The website: `scripts/mkdocs_lead_image.py`, registered under
+    `hooks` in `mkdocs.yml`, rewrites a recipe's Markdown before MkDocs
+    renders it. The heading stays where it was, full-width; only the
+    list moves into a flex row beside the image. `docs/stylesheets/extra.css`
+    (`extra_css` in `mkdocs.yml`) lays that row out and reads the width
+    from a `--lead-image-width` CSS custom property the hook sets on it,
+    defaulting to 30%. The `md_in_html` extension (`markdown_extensions`
+    in `mkdocs.yml`) is what lets the wrapping `<div>` tags carry
+    Markdown content instead of passing through as inert raw HTML.
+    `scripts/mkdocs_lead_image.py` itself lives under `scripts/`, so
+    it is also listed under `watch` in `mkdocs.yml` -- otherwise
+    `mkdocs serve` would not reload on a change to it, since by default
+    it only watches `docs` and `mkdocs.yml`.
   - The PDF: Typst has no CSS-style float-with-text-reflow (see
     https://github.com/typst/typst/discussions/1069), so
     `scripts/build_pdf.py` instead places the image in a fixed two-column
-    Typst grid next to one specific block, not flowing arbitrary content
-    around it. It always pairs the image with the ingredients: it looks,
-    after the image, for the first heading immediately followed by a
-    list (whatever that section happens to be titled -- "Ingrediënten",
-    "Benodigdheden", ...), and puts the image beside that heading and
-    list. Everything between the image and that point (the title, any
-    intro text) stays full-width, above it. A recipe with no such
-    heading-and-list pair keeps its image full-width in the PDF.
-    The image's column takes up 50% of the page width by default. A
-    recipe can set its own width with a `|<width>` suffix on the image's
-    alt text, for example `![Erwtensoep|30%](../Images/erwtensoep.jpg)`.
-    The website renders the alt text as-is, so the suffix becomes part of
-    the image's `alt` attribute there (invisible unless the image fails
-    to load or a screen reader announces it). Only
-    `scripts/build_pdf.py` reads the suffix, and it strips it from the
-    alt text before the recipe reaches Pandoc.
+    Typst grid beside the heading and the list together, not flowing
+    arbitrary content around it. The image's column takes up 50% of the
+    page width by default, overridden by the same `|<width>` suffix.
 - A recipe may start with a small front matter block naming its main
   ingredients, for example:
   ```

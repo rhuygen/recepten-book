@@ -7,7 +7,7 @@ browser-based, CSS-driven PDF pipeline could not (see CLAUDE.md).
 
 For a recipe whose first block is a standalone image, the PDF places
 that image beside the ingredients instead of full-width, mirroring the
-"float right" look of the website (see docs/stylesheets/extra.css). Typst
+two-column look of the website (see scripts/mkdocs_lead_image.py). Typst
 has no CSS-style text reflow around a floating image, so this is a fixed
 two-column layout instead: everything between the image and the first
 heading-and-list pair (the title, and any intro text) stays full-width,
@@ -18,11 +18,10 @@ its own width by adding `|<width>` after the alt text, for example:
 
     ![Erwtensoep|30%](../Images/erwtensoep.jpg)
 
-The website renders the alt text as-is, so "Erwtensoep|30%" becomes the
-image's `alt` attribute there (invisible unless the image fails to load
-or a screen reader announces it). Only this script reads the `|<width>`
-suffix, and it strips it from the alt text before the recipe reaches
-Pandoc.
+The website build honors the same `|<width>` suffix for its own column
+(see scripts/lead_image.py, shared by both builds), and strips it from
+the alt text before either output renders the recipe, so it never
+appears on the page.
 
 A recipe may start with a small `main_ingredients` front matter block,
 for example:
@@ -47,17 +46,16 @@ import subprocess
 import sys
 import tempfile
 
-IMAGE_RE = re.compile(r"^!\[([^\]]*)\]\(([^)]*)\)$")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lead_image import find_heading_list_pair, parse_lead_image, split_blocks
+
 H1_RE = re.compile(r"^#(?!#)\s+(.*)$")
-LIST_ITEM_RE = re.compile(r"^(-|\*|\+|\d+\.)\s")
 FRONT_MATTER_RE = re.compile(r"\A---\n(.*?\n)---\n?", re.DOTALL)
 
 # A lead image may set its own width in the PDF's two-column grid with a
 # `|<width>` suffix on its alt text, for example
-# `![Erwtensoep|30%](../Images/erwtensoep.jpg)`. Only the PDF build (this
-# script) reads this suffix; it is stripped before the alt text reaches
-# Pandoc. The website renders the alt text (including the suffix) as-is.
-WIDTH_VALUE_RE = re.compile(r"^\d+(\.\d+)?%$")
+# `![Erwtensoep|30%](../Images/erwtensoep.jpg)` (see scripts/lead_image.py).
+# The website build honors the same suffix for its own column width.
 DEFAULT_LEAD_IMAGE_WIDTH = "50%"
 
 
@@ -86,18 +84,6 @@ def extract_front_matter(text: str) -> tuple[dict[str, str], str]:
         if sep:
             meta[key.strip()] = value.strip()
     return meta, text[match.end() :]
-
-
-def split_blocks(text: str) -> list[str]:
-    return [b.strip() for b in re.split(r"\n\s*\n+", text.strip()) if b.strip()]
-
-
-def is_heading(block: str) -> bool:
-    return block.startswith("#")
-
-
-def is_list(block: str) -> bool:
-    return bool(LIST_ITEM_RE.match(block.splitlines()[0].strip()))
 
 
 def markdown_to_typst(markdown: str) -> str:
@@ -137,23 +123,15 @@ def tag_title(blocks: list[str], slug: str) -> tuple[list[str], str]:
 
 
 def apply_lead_image_layout(path: str, blocks: list[str]) -> list[str]:
-    if not blocks:
+    parsed = parse_lead_image(blocks, path)
+    if parsed is None:
         return blocks
-
-    match = IMAGE_RE.match(blocks[0])
-    if not match:
-        return blocks
-
-    alt_text, raw_ref = match.groups()
-    if "|" in alt_text:
-        alt_text, _, width = alt_text.rpartition("|")
-        if not WIDTH_VALUE_RE.match(width):
-            raise SystemExit(f"{path}: invalid |<width> suffix {width!r}, expected a percentage like '30%'")
-    else:
+    alt_text, raw_ref, width = parsed
+    if width is None:
         width = DEFAULT_LEAD_IMAGE_WIDTH
 
-    # The width suffix is PDF-only bookkeeping; strip it before the alt
-    # text goes anywhere near Pandoc.
+    # The width suffix is bookkeeping for the image layout; strip it
+    # before the alt text goes anywhere near Pandoc.
     blocks[0] = f"![{alt_text}]({raw_ref})"
 
     image_ref = raw_ref.replace("%20", " ")
@@ -164,10 +142,7 @@ def apply_lead_image_layout(path: str, blocks: list[str]) -> list[str]:
     # ingredients, whatever that section happens to be titled) and pair
     # the image with that. Everything before it -- title, intro text --
     # stays full-width.
-    pair_index = next(
-        (i for i in range(len(rest) - 1) if is_heading(rest[i]) and is_list(rest[i + 1])),
-        None,
-    )
+    pair_index = find_heading_list_pair(rest)
     if pair_index is None:
         return blocks
 
