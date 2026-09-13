@@ -27,6 +27,7 @@ theme:
 
 markdown_extensions:
   - attr_list
+  - md_in_html
   - tables
   - toc:
       permalink: true
@@ -37,3 +38,9 @@ extra_css:
 plugins:
   - search
   - awesome-pages
+
+hooks:
+  - scripts/mkdocs_lead_image.py
+
+watch:
+  - scripts
